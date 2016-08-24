@@ -1,7 +1,6 @@
 package org.mypt.data;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +86,7 @@ public class Round {
 	}
 	
 	public List<RoundResultForPlayer> getResults(){
-		return new ArrayList(roundResultMapForPlayers.values());
+		return new ArrayList<RoundResultForPlayer>(roundResultMapForPlayers.values());
 	}
 
 	public boolean isTimedOut(long timeoutLimitInSeconds){

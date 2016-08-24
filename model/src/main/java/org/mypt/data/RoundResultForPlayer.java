@@ -113,11 +113,11 @@ public class RoundResultForPlayer {
 		return false;
 	}
 
-	private boolean isGroupAttacked() {
-		if(this.groupAttackedByUserIds.size() >0)
-			return true;
-		return false;
-	}
+//	private boolean isGroupAttacked() {
+//		if(this.groupAttackedByUserIds.size() >0)
+//			return true;
+//		return false;
+//	}
 
 	private boolean isAttacking() {
 		if(move.getMoveType().compareTo(MoveType.ATTACK) == 0)
