@@ -1,6 +1,7 @@
 package webapp;
 
 import org.mypt.data.Game;
+import org.mypt.data.UriStrings;
 import org.mypt.rest.GameJoinRequest;
 import org.mypt.rest.GameJoinResponse;
 import org.mypt.rest.GameJoinResponse.Status;
@@ -20,7 +21,7 @@ public class GameController {
 
 	GameNotifier gameNotifier = new GameNotifier();
 
-	@RequestMapping(value = "/webapp/createGame", method = RequestMethod.POST)
+	@RequestMapping(value = UriStrings.CREATE_GAME, method = RequestMethod.POST)
 	public ResponseEntity<Game> create(@RequestBody Game game) {
 
 		if (game != null) {
@@ -35,7 +36,7 @@ public class GameController {
 		}
 	}
 
-	@RequestMapping(value = "/webapp/joinGame", method = RequestMethod.POST)
+	@RequestMapping(value = UriStrings.JOIN_GAME, method = RequestMethod.POST)
 	public ResponseEntity<GameJoinResponse> join(@RequestBody GameJoinRequest joinRequest ) {
 		return performJoinOrExit(joinRequest, true);
 	}

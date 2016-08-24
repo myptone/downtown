@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mypt.data.Game;
+import org.mypt.ui.GameData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

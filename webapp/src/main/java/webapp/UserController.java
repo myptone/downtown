@@ -2,6 +2,7 @@ package webapp;
 
 import java.util.UUID;
 
+import org.mypt.data.UriStrings;
 import org.mypt.data.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class UserController {
         return user;
     }
     
-	@RequestMapping(value = "/webapp/createUser", method = RequestMethod.POST)
+	@RequestMapping(value = UriStrings.CREATE_USER, method = RequestMethod.POST)
 	public ResponseEntity<User> create(@RequestBody User user) {
 
 	    if (user != null) {

@@ -12,7 +12,7 @@
         <module>webapp</module>
 		<module>persist</module>
 	    <module>model</module>
-    
+    <module>apiTest</module>
   </modules>
 
     <build>
