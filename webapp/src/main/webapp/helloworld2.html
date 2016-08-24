@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React!</title>
+  <script src="https://npmcdn.com/react@15.3.0/dist/react.js"></script>
+    <script src="https://npmcdn.com/react-dom@15.3.0/dist/react-dom.js"></script>
+    <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="https://npmcdn.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script>
+
+    <link rel="stylesheet" href="css/foundation.css">
+    <link rel="stylesheet" href="css/app.css">
+  </head>
+  <body>
+      <div class="row">
+        <div class="large-12 columns">
+          <div id="content">hello</div>
+        </div>
+    </div>
+    
+    <script type="text/babel">
+
+    var data = [
+      {key: 1, author: "Pete Hunt", text: "This is one comment"},
+      {key: 2, author: "Jordan Walke", text: "This is *another* comment"}
+    ];
+
+    var CommentEntry = React.createClass({
+    handleClick : function(){
+      alert(this.props.key_);
+    },
+       componentDidMount: function() {
+      //alert(this.props.author);
+    },
+
+    render: function(){
+    return (
+    <div>
+      <h6>{this.props.key_}</h6>
+      <h4 onClick={this.handleClick}>{this.props.author}</h4> 
+      {this.props.children}
+    </div>
+    );
+    }
+    })
+    var CommentList = React.createClass({
+    render : function(){
+    var commentNodes = this.props.data.map(function(comment){
+    return (
+      <CommentEntry  key_={comment.key} author={comment.author}>{comment.text}</CommentEntry>
+    )
+    })
+    return (
+    <div>
+      {commentNodes}
+    </div>
+    );
+    }
+    })
+    var CommentForm = React.createClass({
+    render : function(){
+    return (
+    <textarea>I am the comment  form</textarea>
+    );
+    }
+    })
+    var CommentBox = React.createClass({
+      render: function() {
+        return (
+          <div>
+            <CommentList data={this.props.data}/>
+            <CommentForm />
+
+          </div>
+        );
+      }
+    });
+    function start(){
+      ReactDOM.render(
+        <CommentBox data={data} />,
+        document.getElementById('content')
+        );
+    }
+    start();
+    </script>
+  </body>
+</html>
+
+

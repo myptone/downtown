@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>webapp</artifactId>
+  <packaging>war</packaging>
+  <name>webapp</name>
+  <parent>
+    <groupId>org.mypt</groupId>
+    <artifactId>barfight</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>  
+  <dependencies>
+    <dependency>
+      <groupId>org.mypt</groupId>
+      <artifactId>model</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-web</artifactId>
+		<version>1.3.5.RELEASE</version>
+	</dependency>
+	<!--websockets-->
+<!-- http://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-websocket</artifactId>
+    <version>1.3.5.RELEASE</version>
+</dependency>
+<!-- http://mvnrepository.com/artifact/org.springframework/spring-messaging -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-messaging</artifactId>
+    <version>4.2.6.RELEASE</version>
+</dependency>
+	
+	<!--websockets-->	
+  </dependencies>
+  <build>
+    <finalName>webapp</finalName>
+    <plugins>
+    <plugin>
+      <groupId>org.eclipse.jetty</groupId>
+	  <artifactId>jetty-maven-plugin</artifactId>
+	  <version>9.0.5.v20130815</version>
+    </plugin>
+	<plugin>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-maven-plugin</artifactId>
+		<version>1.3.5.RELEASE</version>
+	</plugin>	
+    </plugins>
+  </build>
+    <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>  
+</project>

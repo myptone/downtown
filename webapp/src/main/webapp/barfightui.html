@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Barfight</title>
+	<script type="text/javascript" src="/js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="/js/react.js"></script>
+    <script type="text/javascript" src="/js/react-dom.js"></script>
+    <script type="text/javascript" src="/js/browser.min.js"></script>
+    <script type="text/javascript" src="/js/barfightdata.js"></script>
+    <link rel="stylesheet" href="css/foundation.css">
+    <link rel="stylesheet" href="css/app.css">
+  </head>
+  <body>
+      <div class="row">
+        <div class="large-12 columns">
+          <div id="content">hello</div>
+        </div>
+    </div>
+   <script type="text/babel">
+    var data = [
+      {dbId: 1, status: "started", numPlayers:3, name: "Legends of Rock, K'mangala"},
+      {dbId: 2, status: "started", numPlayers:3, name: "Local, HSR"}
+    ];
+
+    var GameListEntry = React.createClass({
+    handleClick : function(){
+      alert(this.props.key_);
+    },
+    render : function(){
+    return (
+      <div>
+        <h2 onClick={this.handleClick}>{this.props.name}</h2>
+        <h4>{this.props.status} {this.props.numplayers}</h4>
+      </div>
+      )
+    }
+    });
+
+    var GameList = React.createClass({
+    render: function(){
+      var gameNodes = this.props.data.map(function(game){
+      return (
+      <GameListEntry  key_={game.dbId} name={game.name} status={game.status} numplayers={game.numplayers} />        
+      )
+      });
+      return (
+        <div>
+          {gameNodes}
+        </div>
+      )
+    }
+    });
+
+    var MenuBox = React.createClass({
+    gotoGames : function(){
+      renderGames();
+    },
+    gotoUser : function(){
+      renderUserSetup();
+    },    
+    render : function(){
+      return (
+      <div>
+        <a href="#" className="button" onClick={this.gotoGames}>Games</a>  
+        <a href="#" className="button" onClick={this.gotoUser}>User</a>  
+      </div>
+      )
+    }
+    });
+
+    var GamesBox = React.createClass({
+	getInitialState: function() {
+		return {data: []};
+	},
+	loadGamesFromServer: function() {
+		var uuid = guid();
+		$.ajax({
+		  url: "http://localhost:8080/webapp/gamelist" + "?" + uuid,
+		  dataType: 'json',
+		  cache: false,
+		  success: function(data) {
+			console.log(data);
+			this.setState({data: data});
+		  }.bind(this),
+		  error: function(xhr, status, err) {
+			console.error(this.props.url, status, err.toString());
+		  }.bind(this)
+		});
+	},
+	componentWillMount: function() {
+		this.loadGamesFromServer();
+		this.timer = setInterval(this.loadGamesFromServer, this.props.pollInterval);
+	},	
+    componentWillUnmount: function () {
+        clearInterval(this.timer);
+    },	
+    startNewGame : function(){
+      renderNewGame();
+    },
+    render : function(){
+      return (
+      <div>
+      <MenuBox />
+        <a href="#" className="button" onClick={this.startNewGame}>Start New Game</a>         
+        <GameList data={this.state.data} pollInterval={10000}/>
+      </div>
+      )
+    }
+    });
+
+    var UserBox = React.createClass({
+    save : function(){
+      alert("saving " + document.getElementById('userNameInput').value);
+    },    
+    render : function(){
+      return (
+      <div>
+      <MenuBox />
+        <label>Name</label>
+        <input type="text" placeholder="" id="userNameInput" />
+        <a href="#" className="button expanded" onClick={this.save}>Save</a>               
+      </div>
+      )
+    }
+    });
+
+    var NewGameBox = React.createClass({
+    save : function(){
+      alert("saving " + document.getElementById('locationInput').value);
+    },    
+    render : function(){
+      return (
+      <div>
+      <MenuBox />
+        <label>Location</label>
+        <input type="text" placeholder="" id="locationInput" />
+        <label>Description</label>
+        <input type="text" placeholder="" id="descInput" />        
+        <a href="#" className="button expanded" onClick={this.save}>Save</a>               
+      </div>
+      )
+    }
+    });    
+
+    function renderNewGame(){
+    ReactDOM.render(
+      <NewGameBox/>,
+      document.getElementById('content')
+      );
+    }    
+
+    function renderGames(){
+    ReactDOM.render(
+      <GamesBox data={data} />,
+      document.getElementById('content')
+      );
+    }
+
+    function renderUserSetup(){
+    ReactDOM.render(
+      <UserBox/>,
+      document.getElementById('content')
+      );
+    }
+
+    function start(){
+    renderGames();
+    }
+
+    start();
+    </script>
+  </body>
+</html>
