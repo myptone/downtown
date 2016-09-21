@@ -1,16 +1,12 @@
 package org.mypt.data;
 
 public class Player {
-    private String userDbId;
+    private String user_id;
     private Long points;
     private int consecutiveDefendCount;
+    private String userName;
     
-	public String getUserDbId() {
-		return userDbId;
-	}
-	public void setUserDbId(String userDbId) {
-		this.userDbId = userDbId;
-	}
+
 	public Long getPoints() {
 		return points;
 	}
@@ -22,6 +18,18 @@ public class Player {
 	}
 	public void setConsecutiveDefendCount(int consecutiveDefendCount) {
 		this.consecutiveDefendCount = consecutiveDefendCount;
+	}
+	public String getUser_id() {
+		return user_id;
+	}
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 }

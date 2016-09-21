@@ -3,6 +3,7 @@ package org.mypt.rest;
 public class GameJoinRequest {
     private String gameDbId;
     private String userDbId;
+    private String userName;
 
 	public String getGameDbId() {
 		return gameDbId;
@@ -15,5 +16,11 @@ public class GameJoinRequest {
 	}
 	public void setUserDbId(String userDbId) {
 		this.userDbId = userDbId;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }

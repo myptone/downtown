@@ -10,6 +10,8 @@ public class RoundResultForPlayer {
 	private List<String> restrainedByUserIds = new ArrayList<String>();
 	private List<String> universallyAttackedByUserIds = new ArrayList<String>();
 	private Long calculatedscore;
+	private boolean isScoreCalculated = false;
+	private String roundResultDescription;
 	
 
 	private Move move;
@@ -22,16 +24,38 @@ public class RoundResultForPlayer {
 	}
 
 	public Long calculateScore(){
-		int score = 0;
-		score = score + getUniversalAttackDamage();
-		score = score + getAttackDamage();
-		score = score + getGroupAttackDamage();
-		score = score + getConsecutiveDefendPenalty();
-		calculatedscore = Long.valueOf(score);
+		if(!isScoreCalculated){
+			int score = 0;
+			score = score + getUniversalAttackDamage();
+			score = score + getAttackDamage();
+			score = score + getGroupAttackDamage();
+			score = score + getConsecutiveDefendPenalty();
+			score = score + getNoMovePenalty();
+			calculatedscore = Long.valueOf(score);
+			isScoreCalculated = true;
+			player.setPoints(player.getPoints() + calculatedscore);
+			if(player.getPoints() < 0){
+				player.setPoints(0L);
+			}
+			RoundForPlayerDescriptionGenerator generator = new RoundForPlayerDescriptionGenerator();
+			roundResultDescription = generator.get(this);
+		} 
 		return calculatedscore;
 	}
 
-	private int getConsecutiveDefendPenalty() {
+	public String getDescription(){
+		return roundResultDescription;
+	}
+
+	public int getNoMovePenalty() {
+		int noMovePenalty = 0;
+		if(this.move.getMoveType().compareTo(MoveType.DO_NOTHING) == 0){
+			noMovePenalty = -1;
+		} 
+		return noMovePenalty;
+	}
+
+	public int getConsecutiveDefendPenalty() {
 		int consecutiveDefendPenalty = 0;
 		if(isDefending()){
 			player.setConsecutiveDefendCount(player.getConsecutiveDefendCount() + 1);
@@ -44,7 +68,7 @@ public class RoundResultForPlayer {
 		return consecutiveDefendPenalty;
 	}
 
-	private int getGroupAttackDamage() {
+	public int getGroupAttackDamage() {
 		int groupAttackScore = 0;
 		if(groupAttackedByUserIds.size() > 1){
 			groupAttackScore = groupAttackedByUserIds.size() * -2;
@@ -55,7 +79,7 @@ public class RoundResultForPlayer {
 		return groupAttackScore;
 	}
 
-	private int getUniversalAttackDamage(){
+	public int getUniversalAttackDamage(){
 		int universalAttackScore = 0; 
 		if(universallyAttackedByUserIds.size() == 1){
 			if(isAttacked() || isAttacking() || isGrabbed() || isGroupAttacking() || isGrabbing()){
@@ -65,13 +89,20 @@ public class RoundResultForPlayer {
 		if(isDefending() || isRecharging()){
 			universalAttackScore = 0;
 		}
-		if(isUniversallyAttacking() && universallyAttackedByUserIds.size() >0){
+		if(isPenalizedForSimultaneousUniversalAttack()){
 			universalAttackScore -= 3;
 		}
 		return universalAttackScore;
 	}
 	
-	private int getAttackDamage(){
+	public boolean isPenalizedForSimultaneousUniversalAttack(){
+		if(isUniversallyAttacking() && universallyAttackedByUserIds.size() > 1){
+			return true;
+		}
+		return false;
+	}
+	
+	public int getAttackDamage(){
 		int attackScore = 0;
 		if(attackedByUserIds.size() > 0){
 			attackScore = attackedByUserIds.size() * -1;
@@ -89,50 +120,50 @@ public class RoundResultForPlayer {
 		return attackScore;
 	}
 
-	private boolean isUniversallyAttacking() {
+	public boolean isUniversallyAttacking() {
 		if(move.getMoveType().compareTo(MoveType.UNIVERSAL_ATTACK) == 0)
 			return true;
 		return false;
 	}
 
-	private boolean isDefending() {
+	public boolean isDefending() {
 		if(move.getMoveType().compareTo(MoveType.DEFEND) == 0)
 			return true;
 		return false;
 	}
 
-	private boolean isGroupAttacking() {
+	public boolean isGroupAttacking() {
 		if(move.getMoveType().compareTo(MoveType.GROUP_ATTACK) == 0)
 			return true;
 		return false;
 	}
 
-	private boolean isGrabbing() {
+	public boolean isGrabbing() {
 		if(move.getMoveType().compareTo(MoveType.RESTRAIN) == 0)
 			return true;
 		return false;
 	}
 
-//	private boolean isGroupAttacked() {
-//		if(this.groupAttackedByUserIds.size() >0)
-//			return true;
-//		return false;
-//	}
+	public boolean isGroupAttacked() {
+		if(this.groupAttackedByUserIds.size() >0)
+			return true;
+		return false;
+	}
 
-	private boolean isAttacking() {
+	public boolean isAttacking() {
 		if(move.getMoveType().compareTo(MoveType.ATTACK) == 0)
 			return true;;
 		return false;
 	}
 
-	private boolean isAttacked() {
+	public boolean isAttacked() {
 		if(this.attackedByUserIds.size() >0)
 			return true;
 		return false;
 	}
 
-	private boolean isGrabbingAttacker() {
-		if(move.getMoveType().compareTo(MoveType.ATTACK) == 0){
+	public boolean isGrabbingAttacker() {
+		if(move.getMoveType().compareTo(MoveType.RESTRAIN) == 0){
 			for(String attackedByUserId : attackedByUserIds){
 				if(move.getTargetUserDbId().trim().compareTo(attackedByUserId.trim()) == 0){
 					return true;
@@ -142,13 +173,13 @@ public class RoundResultForPlayer {
 		return false;
 	}
 
-	private boolean isRecharging() {
+	public boolean isRecharging() {
 		if(move.getMoveType().compareTo(MoveType.RECHARGE) == 0)
 			return true;;
 		return false;
 	}
 
-	private boolean isGrabbed() {
+	public boolean isGrabbed() {
 		if(this.restrainedByUserIds.size() >0)
 			return true;
 		return false;
@@ -213,6 +244,9 @@ public class RoundResultForPlayer {
 		this.universallyAttackedByUserIds = universallyAttackedByUserIds;
 	}
 
+	public Player getPlayer(){
+		return this.player;
+	}
 
 	public Move getMove() {
 		return move;
@@ -223,5 +257,7 @@ public class RoundResultForPlayer {
 		this.move = move;
 	}
 
-
+	public String getRoundResultDescription() {
+		return roundResultDescription;
+	}
 }

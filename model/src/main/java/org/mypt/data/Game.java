@@ -5,17 +5,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Game {
+public class Game extends BDOBase{
 	
 	static Logger log = LoggerFactory.getLogger(Game.class);
+	static int ROUND_DURATION_SECS = 10; 
 	
-    private String dbId;
     private String name;
-    private String createdByUserDbId;
+    private String createdByUser_id;
     private Date startTime;
     private Round currentRound;
     private List<Round> pastRounds = new ArrayList<Round>();
@@ -54,15 +55,62 @@ public class Game {
 	public boolean initGame(){
 		if(this.getGameStatus().equals(GameStatus.INITIATED) && this.hasMinimumPlayers()){
 			currentRound = new Round();
-			currentRound.init(0, dbId, getPlayerUserDbIdList());
+			currentRound.init(1, _id, getPlayerUserDbIdList());
 			gameStatus = GameStatus.INPROGRESS;
 			return true;
 		}
 		return false;
 	}
 	
+	public void process(){
+		 Date now = new Date();
+		 long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(now.getTime() - this.getCurrentRound().getStartTime().getTime());
+		 if(ROUND_DURATION_SECS <= diffInSeconds){
+			 if(this.getCurrentRound().getRoundStatus().compareTo(RoundStatus.INPROGRESS) ==0){
+				 this.getCurrentRound().setRoundStatus(RoundStatus.PROCESSING);
+				 this.processCurrentRound();
+				 for(RoundResultForPlayer roundResultForPlayer : this.getCurrentRound().getResults()){
+					 log.info(" {} roundScore {} player points {}", roundResultForPlayer.getUserDbId(), roundResultForPlayer.calculateScore(), roundResultForPlayer.getPlayer().getPoints());
+					 if(roundResultForPlayer.getPlayer().getPoints() == 0){
+						 log.info(" {} player is knocked out!", roundResultForPlayer.getUserDbId(), roundResultForPlayer.calculateScore(), roundResultForPlayer.getPlayer().getPoints());
+					 }
+				 }
+				 if(this.isGameOver()){
+					 // publish some stuff
+					 this.setGameStatus(GameStatus.PROCESSING);
+					 log.info("Game {} over", this.get_id());
+					 this.setGameStatus(GameStatus.COMPLETED);
+				 } else {
+					 log.info("Timing out game {} round {}", this.get_id(), this.getCurrentRound().getRoundCount());
+					 this.startNewRound();
+				 	log.info("For game {} new round {} begins", this.get_id(), this.getCurrentRound().getRoundCount());
+				 }
+			 }
+		 }
+	}
+	
 	public void processCurrentRound(){
 		currentRound.process(players);
+	}
+	
+	public void startNewRound(){
+		int currentRoundCount = currentRound.getRoundCount();
+		addRoundToPastRounds(currentRound);
+		currentRound = new Round();
+		currentRound.init(currentRoundCount + 1, _id, getPlayerUserDbIdList());
+		gameStatus = GameStatus.INPROGRESS;
+	}
+	
+	public boolean isGameOver(){
+		int countOfPlayersWithNonZeroPoints = 0;
+		for(Player player : this.players.values()){
+			if(player.getPoints() > 0)
+				countOfPlayersWithNonZeroPoints++;
+		}
+		if(countOfPlayersWithNonZeroPoints < 3){
+			return true;
+		}
+		return false;
 	}
 	
 	protected List<String> getPlayerUserDbIdList(){
@@ -71,15 +119,6 @@ public class Game {
 			playerUserDbIdList.add(playerUserDbId.trim());
 		}
 		return playerUserDbIdList;
-	}
-    
-
-	public String getDbId() {
-		return dbId;
-	}
-
-	public void setDbId(String dbId) {
-		this.dbId = dbId;
 	}
 
 	public String getName() {
@@ -119,16 +158,6 @@ public class Game {
 		round.setRoundStatus(RoundStatus.COMPLETED);
 		this.pastRounds.add(round);
 	}
-	
-
-
-	public String getCreatedByUserDbId() {
-		return createdByUserDbId;
-	}
-
-	public void setCreatedByUserDbId(String createdByUserDbId) {
-		this.createdByUserDbId = createdByUserDbId;
-	}
 
 	public GameStatus getGameStatus() {
 		return gameStatus;
@@ -152,6 +181,14 @@ public class Game {
 
 	public void setGameSettings(GameSettings gameSettings) {
 		this.gameSettings = gameSettings;
+	}
+
+	public String getCreatedByUser_id() {
+		return createdByUser_id;
+	}
+
+	public void setCreatedByUser_id(String createdByUser_id) {
+		this.createdByUser_id = createdByUser_id;
 	}
 
 }

@@ -2,6 +2,8 @@ package webapp;
 
 import java.util.UUID;
 
+import org.mypt.DBConstants;
+import org.mypt.UserDAO;
 import org.mypt.data.UriStrings;
 import org.mypt.data.User;
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ public class UserController {
     @RequestMapping("/webapp/greeting")
     public User greetingSome(@RequestParam(value="name", defaultValue="Vijay") String name) {
     	User user = new  User();
-    	user.setDbId(UUID.randomUUID().toString());
+    	user.set_id(UUID.randomUUID().toString());
     	user.setName(name);
     	log.info("creating User with name {}", name);
         return user;
@@ -33,8 +35,8 @@ public class UserController {
 
 	    if (user != null) {
 	    	log.info("creating User with name {}", user.getName());
-	    	user.setDbId(UUID.randomUUID().toString());
-	    	// TODO call persistence layer to update
+	    	UserDAO userDAO = new UserDAO();
+	    	userDAO.save(user, DBConstants.USER);
 	    } else {
 	    	log.error("User was null!");
 	    }

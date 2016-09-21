@@ -31,6 +31,7 @@ public class Round {
 	}
 
 	public void init(int roundCount, String gameDbId, List<String> playerUserDbIdList){
+		this.roundCount = roundCount;
 		this.gameDbId = gameDbId;
 		this.roundStatus = RoundStatus.INPROGRESS;
 		this.startTime = new Date();

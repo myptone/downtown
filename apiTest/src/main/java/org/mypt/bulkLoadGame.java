@@ -34,10 +34,20 @@ public class bulkLoadGame implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-    	User creator = createUser("Vijay " + "Creator");
-    	Game game = createGame("LOR " + UUID.randomUUID().toString(), creator);
-    	for(int x = 0; x < 10; x++){
-	    	User user = createUser("Vijay " + UUID.randomUUID().toString());
+        	for(int x = 0; x < 1; x++){
+        		Thread.sleep(1*1000);
+        		log.info("LAUNCHING GAME {}", x + 1);
+        		launchGame();
+    	}
+    }
+    
+    private void launchGame() throws InterruptedException{
+    	RandomBotGenerator botGenerator = new RandomBotGenerator();
+    	User creator = createUser(botGenerator.getNextBot().name);
+    	Game game = createGame("LOR", creator);
+    	Thread.sleep(5*1000);
+    	for(int x = 0; x < 6; x++){
+	    	User user = createUser(botGenerator.getNextBot().name);
 	    	joinUserToGame(game, user);
 	    	String status = getGameStatus(game);
 	    	log.info(status);
@@ -48,7 +58,7 @@ public class bulkLoadGame implements CommandLineRunner {
         RestTemplate restTemplate = new RestTemplate();
         GameData[] gameDatas = restTemplate.getForObject(baseUrl + UriStrings.GAME_LIST, GameData[].class);
         for(GameData gameData : gameDatas){
-        	if(gameData.dbId.compareTo(game.getDbId()) == 0){
+        	if(gameData._id.compareTo(game.get_id()) == 0){
         		return gameData.status;
         	}
         }
@@ -58,8 +68,8 @@ public class bulkLoadGame implements CommandLineRunner {
 	private void joinUserToGame(Game game, User user) {
     	RestTemplate restTemplate = new RestTemplate();
     	GameJoinRequest gameJoinRequest = new GameJoinRequest();
-    	gameJoinRequest.setGameDbId(game.getDbId());
-    	gameJoinRequest.setUserDbId(user.getDbId());
+    	gameJoinRequest.setGameDbId(game.get_id());
+    	gameJoinRequest.setUserDbId(user.get_id());
     	
     	HttpHeaders headers = new HttpHeaders();
     	headers.setContentType(MediaType.APPLICATION_JSON);
@@ -86,13 +96,14 @@ public class bulkLoadGame implements CommandLineRunner {
     }
     
     
-    public Game createGame(String name, User creator){
+    public Game createGame(String name, User creator){    
     	RestTemplate restTemplate = new RestTemplate();
     	Game game = new Game();
     	game.setName(name);
-    	game.setCreatedByUserDbId(creator.getDbId());
+    	game.setCreatedByUser_id(creator.get_id());
     	Game resp = restTemplate.postForObject(baseUrl + UriStrings.CREATE_GAME, game, Game.class);
     	log.info(resp.getName());
     	return resp;
     }
 }
+

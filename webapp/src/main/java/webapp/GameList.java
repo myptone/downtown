@@ -2,7 +2,6 @@ package webapp;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.mypt.data.Game;
@@ -28,16 +27,14 @@ public enum GameList {
 	
 	public synchronized void put(Game game){
 		
-    	log.info("creating Game with name {} by user {}", game.getName(), game.getCreatedByUserDbId());
+    	log.info("creating Game with name {} by user {}", game.getName(), game.getCreatedByUser_id());
     	game.setStartTime(new Date());
-    	game.setDbId(UUID.randomUUID().toString());//TODO why do we set the dbId here
-
 		
 		//add creator to the game
 		Player player = new Player();
 		player.setPoints(10L);
-		player.setUserDbId(game.getCreatedByUserDbId().trim()); 
-		game.getPlayers().put(game.getCreatedByUserDbId().trim(), player);
+		player.setUser_id(game.getCreatedByUser_id().trim()); 
+		game.getPlayers().put(game.getCreatedByUser_id().trim(), player);
 		
 		//add settings if null
 		if(game.getGameSettings() == null){
@@ -47,13 +44,17 @@ public enum GameList {
 
 		//initiate game
 		game.setGameStatus(GameStatus.INITIATED);
-		gameMap.put(game.getDbId(), game);
+		gameMap.put(game.get_id(), game);
 		
 		
 	}
 	
 	public synchronized Game remove(String gameDbId){
 		return gameMap.remove(gameDbId);
+	}
+	
+	public synchronized Game get(String gameDbId){
+		return gameMap.get(gameDbId);
 	}
 	
 	public synchronized GameJoinResponse joinUserToGame(GameJoinRequest joinRequest){
@@ -63,8 +64,9 @@ public enum GameList {
 				switch (game.getGameStatus()) {
 				case INITIATED:
 					Player player = new Player();
+					player.setUserName(joinRequest.getUserName());
 					player.setPoints(10L);
-					player.setUserDbId(joinRequest.getUserDbId().trim());
+					player.setUser_id(joinRequest.getUserDbId().trim());
 					gameMap.get(joinRequest.getGameDbId()).getPlayers().put(joinRequest.getUserDbId().trim(), player);
 					//Try initiating the game
 					if(game.initGame()){
